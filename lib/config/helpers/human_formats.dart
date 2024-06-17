@@ -10,4 +10,10 @@ class HumanFormats {
   
     return formatterNumber;
   }
+
+  static String date(DateTime date) {
+    final formatterDate = DateFormat.yMMMMd('en_US').format(date);
+  
+    return formatterDate;
+  }
 }

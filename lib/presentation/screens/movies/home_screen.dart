@@ -1,3 +1,4 @@
+import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
 import 'package:cinemapedia/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +46,10 @@ class _HomeViewState extends ConsumerState<_HomeView> {
           child: MoviesHorizontalListview(
             movies: ref.watch(nowPlayingMoviesProvider),
             title: 'En cartelera',
-            subtitle: 'Lunes 20 de Julio',
-            loadNextPage: null
+            subtitle: HumanFormats.date(DateTime.now()),
+            loadNextPage: () {
+              ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+            },
           ),
         )
       ],
