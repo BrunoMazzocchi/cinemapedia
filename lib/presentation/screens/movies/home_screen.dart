@@ -31,25 +31,55 @@ class _HomeViewState extends ConsumerState<_HomeView> {
     super.initState();
 
     ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+    ref.read(popularMoviesProvider.notifier).loadNextPage();
   }
 
   @override
   Widget build(BuildContext context) {
     final nowPlayingMovies = ref.watch(moviesSlideShowProvider);
+    final popularMovies = ref.watch(popularMoviesProvider);
 
-    return Column(
-      children: [
-        const CustomAppbar(),
-        MoviesSlideshow(movies: nowPlayingMovies),
-        SizedBox(
-          height: 350,
-          child: MoviesHorizontalListview(
-            movies: ref.watch(nowPlayingMoviesProvider),
-            title: 'En cartelera',
-            subtitle: HumanFormats.date(DateTime.now()),
-            loadNextPage: () {
-              ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+    return CustomScrollView(
+      slivers: [
+        const SliverAppBar(
+          floating: true,
+          flexibleSpace: FlexibleSpaceBar(
+            title: CustomAppbar(),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              return Column(
+                children: [
+                  Column(
+                    children: [
+                      MoviesSlideshow(movies: nowPlayingMovies),
+                      MoviesHorizontalListview(
+                        movies: ref.watch(nowPlayingMoviesProvider),
+                        title: 'En cartelera',
+                        subtitle: HumanFormats.date(DateTime.now()),
+                        loadNextPage: () {
+                          ref
+                              .read(nowPlayingMoviesProvider.notifier)
+                              .loadNextPage();
+                        },
+                      ),
+                      MoviesHorizontalListview(
+                        movies: popularMovies,
+                        title: 'Populares',
+                        loadNextPage: () {
+                          ref
+                              .read(popularMoviesProvider.notifier)
+                              .loadNextPage();
+                        },
+                      ),
+                    ],
+                  )
+                ],
+              );
             },
+            childCount: 1,
           ),
         )
       ],

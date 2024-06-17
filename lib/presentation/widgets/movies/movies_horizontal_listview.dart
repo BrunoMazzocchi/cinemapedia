@@ -47,13 +47,11 @@ class _MoviesHorizontalListviewState extends State<MoviesHorizontalListview> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 350,
+      height: 350,
       child: Column(
         children: [
           if (widget.title != null || widget.subtitle != null)
             _Title(title: widget.title, subtitle: widget.subtitle),
-
-
           Expanded(
             child: ListView.builder(
               controller: scrollController,
@@ -83,9 +81,10 @@ class _Slide extends StatelessWidget {
     
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.only(top: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           SizedBox(
             width: 150,
