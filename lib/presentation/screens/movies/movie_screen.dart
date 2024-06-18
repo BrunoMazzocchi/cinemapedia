@@ -32,7 +32,10 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
 
     if (movie == null) {
       return const Scaffold(
-          body: Center(child: CircularProgressIndicator(strokeWidth: 2)));
+        body: Center(
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
     }
 
     return Scaffold(
@@ -41,9 +44,10 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
         slivers: [
           _CustomSliverAppBar(movie: movie),
           SliverList(
-              delegate: SliverChildBuilderDelegate(
-                  (context, index) => _MovieDetails(movie: movie),
-                  childCount: 1))
+            delegate: SliverChildBuilderDelegate(
+                (context, index) => _MovieDetails(movie: movie),
+                childCount: 1),
+          ),
         ],
       ),
     );
@@ -199,24 +203,29 @@ class _CustomSliverAppBar extends StatelessWidget {
             ),
             const SizedBox.expand(
               child: DecoratedBox(
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          stops: [0.7, 1.0],
-                          colors: [Colors.transparent, Colors.black87]))),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: [0.7, 1.0],
+                    colors: [Colors.transparent, Colors.black87],
+                  ),
+                ),
+              ),
             ),
             const SizedBox.expand(
               child: DecoratedBox(
-                  decoration: BoxDecoration(
-                      gradient:
-                          LinearGradient(begin: Alignment.topLeft, stops: [
-                0.0,
-                0.3
-              ], colors: [
-                Colors.black87,
-                Colors.transparent,
-              ]))),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    stops: [0.0, 0.3],
+                    colors: [
+                      Colors.black87,
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
