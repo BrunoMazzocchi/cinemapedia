@@ -61,4 +61,16 @@ class MovieDbDatasource implements MoviesDataSource {
     final Movie movie = MovieMapper.movieDetailsToEntity(movieDetails);
     return movie;
   }
+
+  @override 
+  Future<List<Movie>> searchMovies(String query, {int page = 1}) {
+    return _client.dio.get('/search/movie', queryParameters: {
+      'query': query,
+      'page': page,
+    }).then((response) {
+      final List<MovieMovieDB> movies = List<MovieMovieDB>.from(
+          response.data['results'].map((x) => MovieMovieDB.fromJson(x)));
+      return movies.map((e) => MovieMapper.movieDBToEntity(e)).toList();
+    });
+  }
 }
