@@ -14,7 +14,7 @@ class Movie {
   final double voteAverage;
   final int voteCount;
 
-  const Movie({
+  Movie({
     required this.adult,
     required this.backdropPath,
     required this.genreIds,

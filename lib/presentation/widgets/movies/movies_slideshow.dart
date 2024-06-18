@@ -1,6 +1,8 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class MoviesSlideshow extends StatelessWidget {
   final List<Movie> movies; 
@@ -67,9 +69,12 @@ class _MovieSlide extends StatelessWidget {
                 );
               }
               // Fade in transition
-              return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                child: child,
+              return GestureDetector(
+                onTap: ()=> context.push('/movie/${movie.id}'),
+                child: FadeIn(
+                  duration: const Duration(milliseconds: 500),
+                  child: child,
+                ),
               );
             },
           ),
