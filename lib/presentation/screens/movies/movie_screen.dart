@@ -7,7 +7,7 @@ import 'package:cinemapedia/domain/entities/movie.dart';
 import 'package:cinemapedia/presentation/providers/providers.dart';
 
 class MovieScreen extends ConsumerStatefulWidget {
-  static const name = 'movie-screen';
+  static const name = '/movie-screen';
 
   final String movieId;
 

@@ -70,7 +70,7 @@ class _MovieSlide extends StatelessWidget {
               }
               // Fade in transition
               return GestureDetector(
-                onTap: ()=> context.push('/movie/${movie.id}'),
+                onTap: ()=> context.push('/home/0/movie/${movie.id}'),
                 child: FadeIn(
                   duration: const Duration(milliseconds: 500),
                   child: child,
