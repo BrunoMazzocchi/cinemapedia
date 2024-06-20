@@ -33,6 +33,14 @@ class CustomAppbar extends ConsumerWidget {
               const Spacer(),
               IconButton(
                 onPressed: () {
+                  ref.read(themeDataProvider.notifier).toggleTheme();
+                },
+                icon: ref.watch(themeDataProvider) == ref.watch(themeDataProvider.notifier).lightTheme
+                    ? const Icon(Icons.brightness_4)
+                    : const Icon(Icons.brightness_7),
+              ),
+              IconButton(
+                onPressed: () {
                   final searchedMovies = ref.read(searchedMoviesProvider);
                   final searchQuery = ref.read(searchQueryProvider);
 
@@ -40,6 +48,7 @@ class CustomAppbar extends ConsumerWidget {
                     query: searchQuery,
                     context: context,
                     delegate: SearchMovieDelegate(
+                        themeData: ref.watch(themeDataProvider),
                         initialMovies: searchedMovies,
                         searchMovies: ref
                             .read(searchedMoviesProvider.notifier)

@@ -8,8 +8,28 @@ import 'package:flutter/material.dart';
 typedef SearchMoviesCallback = Future<List<Movie>> Function(String query);
 
 class SearchMovieDelegate extends SearchDelegate<Movie?> {
+  // Override the app bar theme appBarTheme
+  @override
+  ThemeData appBarTheme(BuildContext context) {
+    return Theme.of(context).copyWith(
+      appBarTheme: AppBarTheme(
+        backgroundColor: themeData.scaffoldBackgroundColor,
+        titleTextStyle: themeData.textTheme.titleMedium!.copyWith(
+          color: themeData.appBarTheme.iconTheme!.color,
+        ),
+        iconTheme: themeData.appBarTheme.iconTheme,
+      ),
+      inputDecorationTheme: themeData.inputDecorationTheme.copyWith(
+        hintStyle: themeData.textTheme.bodyMedium!.copyWith(
+          color: themeData.appBarTheme.iconTheme!.color,
+        ),
+      ),
+    );
+  }
+
   final SearchMoviesCallback searchMovies;
   List<Movie> initialMovies;
+  final ThemeData themeData;
 
   StreamController<List<Movie>> debouncedMovies = StreamController.broadcast();
   StreamController<bool> isLoadingStream = StreamController.broadcast();
@@ -19,6 +39,7 @@ class SearchMovieDelegate extends SearchDelegate<Movie?> {
   SearchMovieDelegate({
     required this.searchMovies,
     required this.initialMovies,
+    required this.themeData,
   }) : super(
           searchFieldLabel: 'Buscar películas',
         );
