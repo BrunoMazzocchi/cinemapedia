@@ -36,4 +36,9 @@ class MovieRepositoryImpl implements MoviesRepository {
   Future<List<Movie>> searchMovies(String query, {int page = 1}) {
     return _dataSource.searchMovies(query, page: page);
   }
+
+  @override
+  Future<List<Movie>> getRecommendations(int movieId, {int page = 1}) {
+    return _dataSource.getRecommendations(movieId, page: page);
+  }
 }

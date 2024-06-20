@@ -1,3 +1,4 @@
+import 'package:cinemapedia/config/helpers/human_formats.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:animate_do/animate_do.dart';
@@ -5,6 +6,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:cinemapedia/domain/entities/movie.dart';
 
 import 'package:cinemapedia/presentation/providers/providers.dart';
+import 'package:go_router/go_router.dart';
 
 class MovieScreen extends ConsumerStatefulWidget {
   static const name = '/movie-screen';
@@ -24,11 +26,16 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
 
     ref.read(movieInfoProvider.notifier).loadMovie(widget.movieId);
     ref.read(actorsByMovieProvider.notifier).loadActors(widget.movieId);
+    ref
+        .read(movieRecommendationsProvider(int.parse(widget.movieId)).notifier)
+        .loadRecommendations();
   }
 
   @override
   Widget build(BuildContext context) {
     final Movie? movie = ref.watch(movieInfoProvider)[widget.movieId];
+    final List<Movie> recommendations =
+        ref.watch(movieRecommendationsProvider(int.parse(widget.movieId)));
 
     if (movie == null) {
       return const Scaffold(
@@ -45,7 +52,8 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
           _CustomSliverAppBar(movie: movie),
           SliverList(
             delegate: SliverChildBuilderDelegate(
-                (context, index) => _MovieDetails(movie: movie),
+                (context, index) => _MovieDetails(
+                    movie: movie, recommendations: recommendations),
                 childCount: 1),
           ),
         ],
@@ -56,8 +64,8 @@ class MovieScreenState extends ConsumerState<MovieScreen> {
 
 class _MovieDetails extends StatelessWidget {
   final Movie movie;
-
-  const _MovieDetails({required this.movie});
+  final List<Movie> recommendations;
+  const _MovieDetails({required this.movie, required this.recommendations});
 
   @override
   Widget build(BuildContext context) {
@@ -109,8 +117,107 @@ class _MovieDetails extends StatelessWidget {
           ),
         ),
         _ActorsByMovie(movieId: movie.id.toString()),
+        Visibility(
+          visible: recommendations.isNotEmpty,
+          child: _Recommendations(movies: recommendations),
+        ),
         const SizedBox(height: 50),
       ],
+    );
+  }
+}
+
+class _Recommendations extends StatelessWidget {
+  final List<Movie> movies;
+
+  const _Recommendations({required this.movies});
+
+  @override
+  Widget build(BuildContext context) {
+    final titleStyle = Theme.of(context).textTheme.titleLarge;
+    final textStyles = Theme.of(context).textTheme;
+
+    return SizedBox(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text('Recommendations', style: titleStyle),
+          ),
+          SizedBox(
+            height: 300,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: movies.length,
+              itemBuilder: (context, index) {
+                final movie = movies[index];
+
+                return GestureDetector(
+                  onTap: () {
+                    context.push('/home/0/movie/${movie.id}');
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    width: 135,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        FadeInRight(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.network(
+                              movie.backdropPath,
+                              height: 180,
+                              width: 135,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        const SizedBox(height: 5),
+                        SizedBox(
+                          width: 150,
+                          child: Text(
+                            movie.title,
+                            style: textStyles.titleSmall,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 150,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                size: 15,
+                                color: Colors.amber,
+                              ),
+                              Text(
+                                movie.voteAverage.toString(),
+                                style: textStyles.bodySmall,
+                              ),
+                              const Spacer(),
+                              Text(
+                                HumanFormats.number(movie.popularity),
+                                style: textStyles.bodySmall,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 }
@@ -175,7 +282,7 @@ class _ActorsByMovie extends ConsumerWidget {
 }
 
 final isFavoriteProvider = FutureProvider.family((ref, int movieId) {
-  final localStorageRepository = ref.watch(localStorageRepositoryProvider); 
+  final localStorageRepository = ref.watch(localStorageRepositoryProvider);
   return localStorageRepository.isFavorite(movieId);
 });
 
@@ -193,7 +300,8 @@ class _CustomSliverAppBar extends ConsumerWidget {
       actions: [
         IconButton(
           icon: isFavoriteFuture.when(
-            data: (isFavorite) => Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
+            data: (isFavorite) =>
+                Icon(isFavorite ? Icons.favorite : Icons.favorite_border),
             loading: () => const CircularProgressIndicator(strokeWidth: 2),
             error: (error, _) => const Icon(Icons.favorite_border),
           ),
@@ -201,7 +309,7 @@ class _CustomSliverAppBar extends ConsumerWidget {
             data: (isFavorite) => isFavorite ? Colors.red : Colors.white,
             loading: () => Colors.white,
             error: (error, _) => Colors.white,
-          ), 
+          ),
           onPressed: () {
             ref.watch(localStorageRepositoryProvider).toogleFavorite(movie);
 
@@ -256,34 +364,26 @@ class _CustomSliverAppBar extends ConsumerWidget {
   }
 }
 
-
 class _CustomGradient extends StatelessWidget {
-
   final AlignmentGeometry begin;
   final AlignmentGeometry end;
   final List<double> stops;
   final List<Color> colors;
 
-  const _CustomGradient({
-    this.begin = Alignment.centerLeft, 
-    this.end = Alignment.centerRight, 
-    required this.stops, 
-    required this.colors
-  });
+  const _CustomGradient(
+      {this.begin = Alignment.centerLeft,
+      this.end = Alignment.centerRight,
+      required this.stops,
+      required this.colors});
 
   @override
   Widget build(BuildContext context) {
-
     return SizedBox.expand(
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: begin,
-            end: end,
-            stops: stops,
-            colors: colors
-          )
-        )
+              begin: begin, end: end, stops: stops, colors: colors),
+        ),
       ),
     );
   }
